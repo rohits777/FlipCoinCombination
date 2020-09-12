@@ -107,11 +107,11 @@ winningComb ()
 mainFlipper ()
 {
 
-	echo "1. For Singlet, meaning 1 coin flip"
-	echo "2. For Doublet, meaning 2 coin flip"
-	echo "3. For Triplet, meaning 3 coin flip"
+	echo "1. For Singlet coin flip"
+	echo "2. For Doublet coin flip"
+	echo "3. For Triplet coin flip"
 	read -p "Select your choice : " number
-	read -p "How many times do you want to flip : " num
+	read -p "How many times  you want to flip : " num
 	if [ $number -eq 1 ]
 	then
 	getResult singletdictt 1 "SINGLET";
@@ -128,7 +128,7 @@ mainFlipper ()
 	sortResult tripletdictt -n "TRIPLET";
 	winningComb tripletdictt;
 	else
-	echo " enter a value  from 1,2 and 3"
+	echo " enter a value between 1 to 3"
 	fi
 }
 
