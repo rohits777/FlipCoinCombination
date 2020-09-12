@@ -1,169 +1,135 @@
-echo "Welcome to flip coin combination program"
+ echo " WELCOME TO COIN COMBINATION "
+#!/bin/bash
 
-#! /bin/bash
+counter=0;
 
-read -p "Enter how many times you want to flip : " n
-printf "\n"
+declare -A singletdictt;
+declare -A doubletdictt;
+declare -A tripletdictt;
 
-function SingletFlipper()
+someFlipper ()
 {
-	flip=$((RANDOM%2))
-	if [ $flip -eq 0 ]
+	result=$((RANDOM%2));
+
+	if [ $result -eq 1 ]
 	then
-		((H++))
-		Singlet[H]=$H
+		echo "H";
 	else
-		((T++))
-		Singlet[T]=$T
+		echo "T";
+	fi;
+}
+storeDict ()
+{
+	local -n dictt=$1;
+	key=$2;
+
+	dictt[$key]=$((${dictt[$key]}+1));
+}
+dispDict ()
+{
+	local -n dictt=$1;
+	dicttName=$2;
+
+	echo $dicttName "Dictionary KEY: " ${!dictt[@]};
+	echo $dicttName "Dictionary VAL: " ${dictt[@]};
+}
+calcPercent ()
+{
+	local -n dictt=$1;
+
+	for key in ${!dictt[@]}
+	do
+		percentage=$(( ${dictt[$key]}*100/$num ));
+		echo "Key: "$key "Value:" ${dictt[$key]} "Percentage: $percentage%";
+	done;
+}
+someCombination ()
+{
+	endRange=$1;
+	local value="";
+
+	for (( i=0; i<$endRange; i++ ))
+	do
+		value="$value""$(someFlipper)";
+	done;
+
+	echo $value;
+}
+moreFlipper ()
+{
+	local -n coindictt=$1;
+	local combination=$2;
+	counter=0;
+
+	while [ $counter -lt $num ]
+	do
+		value=$(someCombination $combination);
+		storeDict coindictt $value;
+		(( counter++ ));
+	done;
+}
+getResult ()
+{
+	local -n flipCoindictt=$1;
+	local combination=$2;
+	local message=$3;
+
+	moreFlipper flipCoindictt $combination;
+	dispDict flipCoindictt $message;
+	calcPercent flipCoindictt;
+}
+sortResult ()
+{
+	local -n dict=$1;
+	local operation=$2;
+	local message=$3;
+
+	result=$(echo ${dict[*]} | tr " " "\n" | sort $operation);
+	echo $message "Sorted Result : " $result;
+}
+winningComb ()
+{
+	local -n dictt=$1;
+	local max=-1;
+	local winningKey="";
+
+	for key in ${!dictt[@]}
+	do
+		if [ ${dictt[$key]} -gt $max ]
+		then
+			max=${dictt[$key]};
+			winningKey=$key;
+		fi;
+	done;
+
+	echo "Winning key : " $winningKey ":" $max;
+}
+mainFlipper ()
+{
+
+	echo "1. For Singlet, meaning 1 coin flip"
+	echo "2. For Doublet, meaning 2 coin flip"
+	echo "3. For Triplet, meaning 3 coin flip"
+	read -p "Select your choice : " number
+	read -p "How many times do you want to flip : " num
+	if [ $number -eq 1 ]
+	then
+	getResult singletdictt 1 "SINGLET";
+	sortResult singletdictt -n "SINGLET";
+	winningComb singletdictt;
+	elif [ $number -eq 2 ]
+	then
+	getResult doubletdictt 2 "DOUBLET";
+	sortResult doubletdictt -n "DOUBLET";
+	winningComb doubletdictt;
+	elif [ $number -eq 3 ]
+	then
+	getResult tripletdictt 3 "TRIPLET";
+	sortResult tripletdictt -n "TRIPLET";
+	winningComb tripletdictt;
+	else
+	echo " enter a value  from 1,2 and 3"
 	fi
 }
-function DoubletFlipper()
-{
-	flip=$((RANDOM%4))
-	if [ $flip -eq 0 ]
-	then
-		((HH++))
-		Doublet[HH]=$HH
-	elif [ $flip -eq 1 ]
-	then
-		((TT++))
-		Doublet[TT]=$TT
-	elif [ $flip -eq 2 ]
-	then
-		((HT++))
-		Doublet[HT]=$HT
-	else
-		((TH++))
-		Doublet[TH]=$TH
-	fi
-}
-function TripletFlipper()
-{
-	flip=$((RANDOM%8))
-	if [ $flip -eq 0 ]
-	then
-		((HHH++))
-		Triplet[HHH]=$HHH
-	elif [ $flip -eq 1 ]
-	then
-		((HHT++))
-		Triplet[HHT]=$HHT
-	elif [ $flip -eq 2 ]
-	then
-		((HTH++))
-		Triplet[HTH]=$HTH
-	elif [ $flip -eq 3 ]
-	then
-		((HTT++))
-		Triplet[HTT]=$HTT
-	elif [ $flip -eq 4 ]
-	then
-		((THH++))
-		Triplet[THH]=$THH
-	elif [ $flip -eq 5 ]
-	then
-		((THT++))
-		Triplet[THT]=$THT
-	elif [ $flip -eq 6 ]
-	then
-		((TTH++))
-		Triplet[TTH]=$TTH
-	else
-		((TTT++))
-		Triplet[TTT]=$TTT
-	fi
-}
 
-declare -A Singlet
-H=0
-T=0
-
-for (( i=0 ; i<$n ; i++ ))
-do
-	SingletFlipper
-done
-
-for i in ${!Singlet[@]}
-do
-echo "$i - ${Singlet[$i]}"
-if [[ $i -eq H ]]
-then
-echo "Singlet Head Percentage H : `echo "scale=1; ${Singlet[$i]}*100/$n" | bc ` %"
-else
-echo "Singlet Head Percentage H : `echo "scale=1; ${Singlet[$i]}*100/$n" | bc ` %"
-fi
-done
-
-
-declare -A Doublet
-HH=0
-TT=0
-HT=0
-TH=0
-
-for (( i=0 ; i<$n ;i++ ))
-do
-	DoubletFlipper
-done
-
-for j in ${!Doublet[@]}
-do
-    echo "$j - ${Doublet[$j]}"
-    if [[ $j -eq HH ]]
-    then
-        echo "Doublet Head-Head Percentage HH : `echo "scale=1; ${Doublet[$j]}*100/$n" | bc ` %"
-    elif [[ $j -eq TT ]]
-    then
-        echo "Doublet Tail-Tail Percentage TT : `echo "scale=1; ${Doublet[$j]}*100/$n" | bc ` %"
-    elif [[ $j -eq HT ]]
-    then
-        echo "Doublet Head-Tail Percentage HT : `echo "scale=1; ${Doublet[$j]}*100/$n" | bc ` %"
-    else
-        echo "Doublet Tail-Head Percentage TH : `echo "scale=1; ${Doublet[$j]}*100/$n" | bc ` %"
-    fi
-done
-
-
-declare -A Triplet
-HHH=0
-HHT=0
-HTH=0
-HTT=0
-TTT=0
-THH=0
-THT=0
-TTH=0
-
-for (( i=0; i<$n; i++ ))
-do
-	TripletFlipper
-done
-
-for k in ${!Triplet[@]}
-do
-    echo "$k - ${Triplet[$k]}"
-    if [[ $k -eq HHH ]]
-    then
-        echo "Triplet H-H-H percentage : `echo "scale=1; ${Triplet[$k]}*100/$n" | bc ` %"
-    elif [[ $k -eq HHT ]]
-    then
-        echo "Triplet H-H-T percentage : `echo "scale=1; ${Triplet[$k]}*100/$n" | bc ` %"
-    elif [[ $k -eq HTH ]]
-    then
-        echo "Triplet H-T-H percentage : `echo "scale=1; ${Triplet[$k]}*100/$n" | bc ` %"
-    elif [[ $k -eq HTT ]]
-    then
-        echo "Triplet H-T-T percentage : `echo "scale=1; ${Triplet[$k]}*100/$n" | bc ` %"
-    elif [[ $k -eq THH ]]
-    then
-        echo "Triplet T-H-H percentage : `echo "scale=1; ${Triplet[$k]}*100/$n" | bc ` %"
-    elif [[ $k -eq THT ]]
-    then
-        echo "Triplet T-H-T percentage : `echo "scale=1; ${Triplet[$k]}*100/$n" | bc ` %"
-    elif [[ $k -eq TTH ]]
-    then
-        echo "Triplet T-T-H percentage : `echo "scale=1; ${Triplet[$k]}*100/$n" | bc ` %"
-    else
-        echo "Triplet T-T-T percentage : `echo "scale=1; ${Triplet[$k]}*100/$n" | bc ` %"
-    fi
-done
+mainFlipper;
